@@ -6,6 +6,7 @@ import { RepoPlanet } from './RepoPlanet'
 import { OrbitRing } from './OrbitRing'
 import { StarField } from './StarField'
 import { CameraRig } from './CameraRig'
+import { NebulaClouds } from './NebulaClouds'
 import { OrbitControls } from '@react-three/drei'
 
 interface GalaxySceneProps {
@@ -16,25 +17,26 @@ export function GalaxyScene({ profile }: GalaxySceneProps) {
   return (
     <group>
       <StarField />
+      <NebulaClouds />
       <CameraRig />
       
       {/* Controls for manual navigation */}
       <OrbitControls 
         enablePan={false}
         enableZoom={true}
-        minDistance={10}
-        maxDistance={60}
-        maxPolarAngle={Math.PI / 1.5} // Don't let the camera go too far below the plane
+        minDistance={15}
+        maxDistance={80}
+        maxPolarAngle={Math.PI / 1.8} // Restrict looking under the galaxy completely
+        minPolarAngle={Math.PI / 6} // Don't look exactly top-down
         autoRotate
-        autoRotateSpeed={0.5}
+        autoRotateSpeed={0.3}
+        dampingFactor={0.05} // Smoother inertia
       />
 
       <UserStar user={profile.user} summary={profile.summary} />
 
       {profile.repos.map((repo, index) => {
-        // Distribute starting positions randomly along the orbit
         const initialAngle = (index / profile.repos.length) * Math.PI * 2 + Math.random()
-        
         return (
           <group key={repo.id}>
             <OrbitRing radius={repo.orbitRadius} />
