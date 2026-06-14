@@ -24,6 +24,22 @@
   --color-foreground: var(--text-primary);
   --font-sans: Inter, Geist, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Geist Mono', monospace;
+
+  /* Custom Code Nebula Colors */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-glass: var(--surface-glass);
+  --color-border-glass: var(--border-glass);
+  --color-cyan: var(--cyan);
+  --color-blue: var(--blue);
+  --color-violet: var(--violet);
+  --color-pink: var(--pink);
+  --color-emerald: var(--emerald);
+  --color-amber: var(--amber);
+  --color-danger: var(--danger);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
 }
 
 *,
