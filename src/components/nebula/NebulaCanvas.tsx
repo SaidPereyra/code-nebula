@@ -14,31 +14,33 @@ export function NebulaCanvas({ profile }: NebulaCanvasProps) {
   return (
     <div className="absolute inset-0 w-full h-full bg-bg z-0 overflow-hidden">
       <Canvas
-        camera={{ position: [0, 20, 45], fov: 45 }} // Pulled back slightly for better cinematic view
+        camera={{ position: [0, 18, 42], fov: 50 }}
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]} // Slightly lower cap to maintain FPS
       >
         <color attach="background" args={['#020617']} />
-        <fog attach="fog" args={['#020617', 30, 120]} /> {/* Spatial depth fog */}
-        
-        {/* Cinematic Lighting */}
-        <ambientLight intensity={0.1} />
-        <directionalLight position={[10, 20, 10]} intensity={1.5} color="#ffffff" />
+        {/* Subtle fog — starts late so planets don't fade too fast */}
+        <fog attach="fog" args={['#020617', 50, 140]} />
+
+        {/* Cinematic Lighting: dim ambient + directional to show depth on planets */}
+        <ambientLight intensity={0.08} />
+        <directionalLight position={[15, 25, 10]} intensity={1.2} color="#e2e8f0" />
 
         <Suspense fallback={null}>
           <GalaxyScene profile={profile} />
-          
-          <EffectComposer enableNormalPass={false} multisampling={4}>
-            <Bloom 
-              luminanceThreshold={0.2} 
-              luminanceSmoothing={0.9} 
-              intensity={1.2} 
-              mipmapBlur 
+
+          <EffectComposer enableNormalPass={false} multisampling={0}>
+            <Bloom
+              luminanceThreshold={0.4}  // Higher threshold = only bright emissives bloom
+              luminanceSmoothing={0.7}
+              intensity={0.8}           // Reduced from 1.2
+              mipmapBlur
             />
-            <Vignette eskil={false} offset={0.1} darkness={1.1} />
+            <Vignette eskil={false} offset={0.15} darkness={1.0} />
           </EffectComposer>
         </Suspense>
       </Canvas>
     </div>
   )
 }
+
