@@ -135,7 +135,7 @@ src/
 Add your Code Nebula galaxy to your GitHub profile:
 
 ```md
-[![Code Nebula](https://code-nebula.vercel.app/api/widget/YOUR_USERNAME)](https://code-nebula.vercel.app/u/YOUR_USERNAME)
+[![Code Nebula](https://code-nebula-three.vercel.app/api/widget/YOUR_USERNAME)](https://code-nebula-three.vercel.app/u/YOUR_USERNAME)
 ```
 
 ---

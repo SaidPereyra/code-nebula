@@ -12,7 +12,7 @@ interface WidgetPreviewProps {
 export function WidgetPreview({ username }: WidgetPreviewProps) {
   const visible = useNebulaStore((state) => state.widgetVisible)
   const setWidgetVisible = useNebulaStore((state) => state.setWidgetVisible)
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '')
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://code-nebula-three.vercel.app').replace(/\/$/, '')
   const encodedUsername = encodeURIComponent(username)
   const widgetUrl = `${appUrl}/api/widget/${encodedUsername}`
   const profileUrl = `${appUrl}/u/${encodedUsername}`
