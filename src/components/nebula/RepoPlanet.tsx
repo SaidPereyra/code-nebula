@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Sphere } from '@react-three/drei'
 import * as THREE from 'three'
@@ -8,117 +8,146 @@ import { NebulaRepo } from '@/lib/github/github.types'
 import { useNebulaStore } from '@/store/nebula.store'
 import { PlanetAtmosphere } from './PlanetAtmosphere'
 import { PlanetRing } from './PlanetRing'
+import { PlanetSurface } from './PlanetSurface'
+import { SelectionBurst } from './SelectionBurst'
 
 interface RepoPlanetProps {
   repo: NebulaRepo
   initialAngle: number
+  worldPosition: THREE.Vector3
+  reducedMotion: boolean
 }
 
-export function RepoPlanet({ repo, initialAngle }: RepoPlanetProps) {
+export function RepoPlanet({ repo, initialAngle, worldPosition, reducedMotion }: RepoPlanetProps) {
   const groupRef = useRef<THREE.Group>(null)
+  const bodyRef = useRef<THREE.Group>(null)
   const planetRef = useRef<THREE.Mesh>(null)
   const highlightRef = useRef<THREE.Mesh>(null)
   const [hovered, setHovered] = useState(false)
-  
+
   const setSelectedRepo = useNebulaStore((state) => state.setSelectedRepo)
   const selectedRepo = useNebulaStore((state) => state.selectedRepo)
+  const lastDiscoveredRepoId = useNebulaStore((state) => state.lastDiscoveredRepoId)
+  const discoverySequence = useNebulaStore((state) => state.discoverySequence)
   const isSelected = selectedRepo?.id === repo.id
+  const isHighlighted = hovered || isSelected
 
-  // Memoize random rotation axes for variety
-  const rotationAxis = useMemo(() => new THREE.Vector3(
-    Math.random() * 0.2, 
-    1, 
-    Math.random() * 0.2
-  ).normalize(), [])
+  const rotationAxis = useMemo(
+    () =>
+      new THREE.Vector3(
+        ((repo.id * 17) % 9) * 0.018,
+        1,
+        ((repo.id * 29) % 11) * 0.014
+      ).normalize(),
+    [repo.id]
+  )
+  const surfaceSeed = useMemo(() => ((repo.id % 10007) / 10007) * 12, [repo.id])
+  const ringColor = useMemo(
+    () =>
+      `#${new THREE.Color(repo.theme.primary)
+        .lerp(new THREE.Color('#ffffff'), 0.28)
+        .getHexString()}`,
+    [repo.theme.primary]
+  )
 
-  useFrame((state, delta) => {
+  const radius =
+    0.48 +
+    ((THREE.MathUtils.clamp(repo.planetRadius, 0.4, 0.9) - 0.4) / 0.5) * 0.3
+  const hasRing = Boolean(repo.isProfileRepo)
+
+  useFrame((_, delta) => {
     if (groupRef.current) {
-      // Orbit rotation
       groupRef.current.rotation.y += repo.orbitSpeed * delta * 0.3
     }
     if (planetRef.current) {
-      // Self rotation on an angle
       planetRef.current.rotateOnAxis(rotationAxis, delta * 0.8)
     }
+    if (bodyRef.current) {
+      const targetScale = isHighlighted ? 1.1 : 1
+      const nextScale = THREE.MathUtils.damp(bodyRef.current.scale.x, targetScale, 8, delta)
+      bodyRef.current.scale.setScalar(nextScale)
+      bodyRef.current.getWorldPosition(worldPosition)
+    }
     if (highlightRef.current) {
-      // Slowly rotate the selection highlight
-      highlightRef.current.rotation.z += delta * 1.5
+      highlightRef.current.rotation.z += delta * 1.2
     }
   })
 
-  // Set cursor style
-  useState(() => {
-    if (hovered) {
-      document.body.style.cursor = 'pointer'
-    } else {
-      document.body.style.cursor = 'auto'
+  useEffect(() => {
+    if (!hovered) return
+
+    document.body.style.cursor = 'pointer'
+    return () => {
+      document.body.style.cursor = ''
     }
-  })
-
-  // Premium look: selected/hovered planets pop more
-  const isHighlighted = hovered || isSelected
-  const scale = isHighlighted ? repo.planetRadius * 1.15 : repo.planetRadius
-
-  // Add a ring only to one of the biggest planets for visual variety (e.g. the Go microservice mock)
-  const hasRing = repo.language === 'Go' || repo.id === 4
+  }, [hovered])
 
   return (
     <group ref={groupRef} rotation={[0, initialAngle, 0]}>
       <group position={[repo.orbitRadius, 0, 0]}>
-        
-        {/* Interactive Hitbox (invisible sphere slightly larger to catch clicks easier) */}
-        <mesh
-          visible={false}
-          onPointerOver={(e) => {
-            e.stopPropagation()
-            setHovered(true)
-          }}
-          onPointerOut={(e) => {
-            e.stopPropagation()
-            setHovered(false)
-            document.body.style.cursor = 'auto'
-          }}
-          onClick={(e) => {
-            e.stopPropagation()
-            setSelectedRepo(repo)
-          }}
-        >
-          <sphereGeometry args={[scale * 1.5, 16, 16]} />
-          <meshBasicMaterial transparent opacity={0} />
-        </mesh>
-
-        {/* Planet Core */}
-        <Sphere ref={planetRef} args={[scale, 64, 64]}>
-          <meshStandardMaterial
-            color={repo.theme.primary}
-            emissive={repo.theme.emissive}
-            emissiveIntensity={isHighlighted ? 0.6 : 0.15}
-            roughness={0.6}
-            metalness={0.3}
-          />
-          {hasRing && <PlanetRing radius={scale} color={repo.theme.secondary} />}
-        </Sphere>
-
-        {/* Atmosphere */}
-        <PlanetAtmosphere 
-          radius={scale} 
-          color={repo.theme.emissive} 
-          intensity={isHighlighted ? 0.4 : 0.15} 
-        />
-
-        {/* Sci-fi Selection Highlight Ring */}
-        {isHighlighted && (
-          <mesh ref={highlightRef} rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[scale * 1.5, scale * 1.55, 64]} />
-            <meshBasicMaterial 
-              color={repo.theme.emissive} 
-              side={THREE.DoubleSide} 
-              transparent 
-              opacity={0.8}
-              blending={THREE.AdditiveBlending}
-            />
+        <group ref={bodyRef}>
+          <mesh
+            visible={false}
+            onPointerOver={(event) => {
+              event.stopPropagation()
+              setHovered(true)
+            }}
+            onPointerOut={(event) => {
+              event.stopPropagation()
+              setHovered(false)
+            }}
+            onClick={(event) => {
+              event.stopPropagation()
+              setSelectedRepo(repo)
+            }}
+          >
+            <sphereGeometry args={[radius * 1.6, 16, 16]} />
+            <meshBasicMaterial transparent opacity={0} />
           </mesh>
-        )}
+
+          <Sphere ref={planetRef} args={[radius, 48, 48]}>
+            <PlanetSurface
+              primary={repo.theme.primary}
+              secondary={repo.theme.secondary}
+              emissive={repo.theme.emissive}
+              seed={surfaceSeed}
+              highlighted={isHighlighted}
+            />
+            {hasRing && <PlanetRing radius={radius} color={ringColor} />}
+          </Sphere>
+
+          <PlanetAtmosphere
+            radius={radius}
+            color={repo.theme.emissive}
+            intensity={isHighlighted ? 0.5 : 0.22}
+          />
+
+          {!reducedMotion &&
+            isSelected &&
+            lastDiscoveredRepoId === repo.id &&
+            discoverySequence > 0 && (
+              <SelectionBurst
+                key={discoverySequence}
+                color={repo.theme.emissive}
+                radius={radius}
+                seed={repo.id + discoverySequence * 101}
+              />
+            )}
+
+          {isHighlighted && (
+            <mesh ref={highlightRef} rotation={[Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[radius * 1.5, radius * 1.54, 64]} />
+              <meshBasicMaterial
+                color={repo.theme.emissive}
+                side={THREE.DoubleSide}
+                transparent
+                opacity={0.58}
+                blending={THREE.AdditiveBlending}
+                depthWrite={false}
+              />
+            </mesh>
+          )}
+        </group>
       </group>
     </group>
   )

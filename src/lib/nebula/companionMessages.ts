@@ -1,56 +1,80 @@
-// Mensajes de Nebbi — PROJECT_CONTEXT.md §10
+import type { NebulaRepo } from '@/lib/github/github.types'
 
 export type NebbiState =
   | 'idle'
   | 'loading'
   | 'loaded'
   | 'planetSelected'
+  | 'activeRepo'
+  | 'popularRepo'
+  | 'dormantRepo'
+  | 'galaxySummary'
   | 'widgetReady'
   | 'error'
   | 'noRepos'
 
 export const companionMessages: Record<NebbiState, string[]> = {
   idle: [
-    'Enter a GitHub username and I\'ll scan the code sector.',
-    'I\'m ready to explore. Give me a username to scan.',
-    'The galaxy awaits. Which developer shall we explore?',
+    'Enter a GitHub username and I’ll scan the code sector.',
+    'I’m ready to explore. Give me a username to scan.',
   ],
   loading: [
     'Scanning GitHub signals...',
     'Calibrating orbit paths...',
-    'Searching for code planets...',
     'Mapping the code sector...',
-    'Reading commit energy signatures...',
   ],
   loaded: [
     'Orbit paths calculated. Your galaxy is ready.',
-    'I found the system. Let\'s explore.',
-    'The planets are in motion. Click one to scan it.',
+    'I found the system. Select a planet and I’ll scan it.',
+    'Repository signals are stable. Let’s explore.',
   ],
   planetSelected: [
-    'This planet is glowing. Recent activity detected.',
-    'Strong commit energy around this orbit.',
-    'Scanning repository... data stream open.',
-    'Interesting signals coming from this sector.',
+    'Scanning repository structure and activity signals.',
+    'Data stream open. This planet has a stable signature.',
+    'Repository telemetry acquired.',
+  ],
+  activeRepo: [
+    'Strong commit energy detected. This planet is highly active.',
+    'Recent activity is keeping this world in motion.',
+    'Fresh development signals are radiating from this repository.',
+  ],
+  popularRepo: [
+    'High star density detected. This planet has serious gravity.',
+    'Other developers are orbiting this signal. It stands out.',
+    'Popular repository signature confirmed.',
+  ],
+  dormantRepo: [
+    'Low activity detected. This planet has entered a quiet cycle.',
+    'The signal is calm, but its history is still visible.',
+    'Dormant orbit confirmed. This repository has been resting.',
+  ],
+  galaxySummary: [
+    'Three planetary signals mapped. Your galaxy summary is ready.',
+    'Exploration milestone reached. I assembled your sector report.',
   ],
   widgetReady: [
     'Your nebula signal is ready to share.',
     'README beacon generated.',
-    'Copy the signal and broadcast it to your profile.',
   ],
   error: [
     'Signal lost. The sector might not exist.',
-    'I couldn\'t reach that part of the galaxy.',
     'Something went wrong in deep space. Try again.',
   ],
   noRepos: [
     'I found a quiet sector. This profile has no public planets yet.',
     'Empty orbit paths. No public repositories detected.',
-    'This developer is still building their system.',
   ],
 }
 
-export function getRandomMessage(state: NebbiState): string {
+export function resolveNebbiState(repo: NebulaRepo): NebbiState {
+  if (repo.stars >= 100) return 'popularRepo'
+  if (repo.activityScore >= 0.65) return 'activeRepo'
+  if (repo.activityScore <= 0.35) return 'dormantRepo'
+  return 'planetSelected'
+}
+
+export function getCompanionMessage(state: NebbiState, seed = 0): string {
   const messages = companionMessages[state]
-  return messages[Math.floor(Math.random() * messages.length)]
+  const index = Math.abs(seed * 31 + state.length * 7) % messages.length
+  return messages[index]
 }

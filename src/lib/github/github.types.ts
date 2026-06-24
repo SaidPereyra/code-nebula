@@ -49,6 +49,8 @@ export type NebulaRepo = {
   orbitSpeed: number
   planetRadius: number
   theme: LanguageTheme
+  isProfileRepo?: boolean
+  pageUrl?: string
 }
 
 export type NebulaSummary = {
@@ -64,4 +66,18 @@ export type NebulaProfile = {
   user: GitHubUser
   repos: NebulaRepo[]
   summary: NebulaSummary
+}
+
+export type GitHubApiErrorCode =
+  | 'INVALID_USERNAME'
+  | 'USER_NOT_FOUND'
+  | 'RATE_LIMITED'
+  | 'GITHUB_UNAVAILABLE'
+
+export type GitHubApiErrorResponse = {
+  error: {
+    code: GitHubApiErrorCode
+    message: string
+    retryAt?: string
+  }
 }

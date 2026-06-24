@@ -43,7 +43,7 @@ const features = [
 
 export function FeatureCards() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mx-auto mt-24 px-4">
+    <div className="mx-auto mt-16 grid w-full min-w-0 max-w-5xl grid-cols-1 gap-6 px-4 sm:mt-24 md:grid-cols-3">
       {features.map((feature, idx) => (
         <GlassPanel key={idx} className="p-6 flex flex-col gap-4 hover:border-cyan/30 transition-colors group">
           <div className="w-12 h-12 rounded-xl bg-surface border border-border-glass flex items-center justify-center group-hover:scale-110 transition-transform">

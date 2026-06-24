@@ -4,7 +4,7 @@ import { Footer } from './Footer'
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col relative text-text-primary font-sans">
+    <div className="relative flex min-h-screen min-w-0 max-w-full flex-col overflow-x-clip font-sans text-text-primary">
       {/* Global Space Background */}
       <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-bg" />
@@ -34,7 +34,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <Header />
       
-      <main className="flex-1 flex flex-col mt-16 relative z-0">
+      <main className="relative z-0 mt-16 flex min-w-0 flex-1 flex-col">
         {children}
       </main>
 

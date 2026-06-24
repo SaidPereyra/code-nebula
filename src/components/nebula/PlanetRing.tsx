@@ -1,8 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+import { StardustRing } from './OrbitRing'
 
 interface PlanetRingProps {
   radius: number
@@ -10,27 +8,17 @@ interface PlanetRingProps {
 }
 
 export function PlanetRing({ radius, color }: PlanetRingProps) {
-  const meshRef = useRef<THREE.Mesh>(null)
-
-  useFrame((_, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.z -= delta * 0.2
-    }
-  })
-
   return (
-    <mesh ref={meshRef} rotation={[Math.PI / 2.2, 0.2, 0]}>
-      {/* Flat ring with inner hole */}
-      <ringGeometry args={[radius * 1.4, radius * 2.2, 64]} />
-      <meshStandardMaterial
-        color={color}
-        emissive={color}
-        emissiveIntensity={0.2}
-        transparent
-        opacity={0.6}
-        side={THREE.DoubleSide}
-        roughness={0.8}
-      />
-    </mesh>
+    <StardustRing
+      radius={radius * 1.685}
+      radialSpread={radius * 0.265}
+      verticalSpread={radius * 0.018}
+      count={Math.round(290 + radius * 68)}
+      color={color}
+      opacity={0.52}
+      driftSpeed={-0.08}
+      seed={Math.round(radius * 10007)}
+      rotation={[0.32, 0.2, 0.1]}
+    />
   )
 }

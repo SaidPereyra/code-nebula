@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils/cn'
+import {
+  isValidGitHubUsername,
+  normalizeGitHubUsername,
+} from '@/lib/github/github.validation'
 
 export function UsernameSearch() {
   const [username, setUsername] = useState('')
@@ -11,22 +15,23 @@ export function UsernameSearch() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!username.trim()) {
+    const normalizedUsername = normalizeGitHubUsername(username)
+    if (!isValidGitHubUsername(normalizedUsername)) {
       setError(true)
       return
     }
     setError(false)
-    router.push(`/u/${username.trim()}`)
+    router.push(`/u/${encodeURIComponent(normalizedUsername)}?intro=1`)
   }
 
   const handleDemo = () => {
-    router.push('/u/saidpereyra')
+    router.push('/u/saidpereyra?intro=1')
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto flex flex-col gap-4">
-      <form onSubmit={handleSubmit} className="relative flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+    <div className="mx-auto flex w-full min-w-0 max-w-lg flex-col gap-4">
+      <form onSubmit={handleSubmit} className="relative flex min-w-0 flex-col gap-3 sm:flex-row">
+        <div className="relative min-w-0 flex-1">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-text-muted">
             {/* GitHub-like user icon */}
             <svg xmlns="http://www.w3.org/-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">

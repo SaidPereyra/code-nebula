@@ -3,39 +3,33 @@
 import { useNebulaStore } from '@/store/nebula.store'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { formatNumber, formatDate } from '@/lib/utils/format'
-import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 
 export function RepoPanel() {
   const selectedRepo = useNebulaStore((state) => state.selectedRepo)
   const setSelectedRepo = useNebulaStore((state) => state.setSelectedRepo)
-  const [show, setShow] = useState(false)
-
-  // Trigger entrance animation cleanly
-  useEffect(() => {
-    if (selectedRepo) setShow(true)
-    else setShow(false)
-  }, [selectedRepo])
-
   if (!selectedRepo) return null
 
   return (
-    <div 
-      className={`absolute right-6 top-24 w-80 z-20 transition-all duration-500 ease-out ${
-        show ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
-      }`}
+    <motion.div
+      key={selectedRepo.id}
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.28, ease: 'easeOut' }}
+      className="absolute right-4 top-20 z-20 w-[calc(100vw-2rem)] max-w-[19rem] sm:right-6 sm:top-24"
     >
-      <GlassPanel glow className="p-0 border-t-2 overflow-hidden" style={{ borderTopColor: selectedRepo.theme.primary }}>
+      <GlassPanel className="p-0 border-t overflow-hidden shadow-[0_20px_60px_rgba(2,6,23,0.48)]" style={{ borderTopColor: selectedRepo.theme.primary }}>
         
         {/* Subtle scanline overlay for cyber feel */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(255,255,255,0)_50%,rgba(0,0,0,1)_50%)] bg-[length:100%_4px]" />
+        <div className="absolute inset-0 pointer-events-none opacity-[0.015] bg-[linear-gradient(rgba(255,255,255,0)_50%,rgba(0,0,0,1)_50%)] bg-[length:100%_5px]" />
         
         {/* Glowing top accent reflection */}
         <div 
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] shadow-[0_0_15px_rgba(255,255,255,0.8)]" 
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px opacity-70 shadow-[0_0_10px_currentColor]"
           style={{ backgroundColor: selectedRepo.theme.primary }} 
         />
 
-        <div className="p-6 relative z-10">
+        <div className="p-5 relative z-10">
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-bg/60 border border-border-glass">
               <div 
@@ -48,6 +42,7 @@ export function RepoPanel() {
             </div>
             <button 
               onClick={() => setSelectedRepo(null)}
+              aria-label="Close repository details"
               className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-glass border border-border-glass text-text-muted hover:text-white hover:bg-surface transition-all"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -57,19 +52,19 @@ export function RepoPanel() {
             </button>
           </div>
 
-          <h2 className="text-xl font-bold text-text-primary mb-2 line-clamp-2 drop-shadow-md">
+          <h2 className="text-lg font-bold text-text-primary mb-2 line-clamp-2">
             {selectedRepo.name}
           </h2>
           
           {selectedRepo.description ? (
-            <p className="text-sm text-text-secondary mb-6 line-clamp-3 leading-relaxed">
+            <p className="text-sm text-text-secondary mb-5 line-clamp-3 leading-relaxed">
               {selectedRepo.description}
             </p>
           ) : (
-            <p className="text-sm text-text-muted italic mb-6">No description provided.</p>
+            <p className="text-sm text-text-muted italic mb-5">No description provided.</p>
           )}
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-3 mb-5">
             <div className="bg-bg/60 p-3 rounded-lg border border-border-glass relative overflow-hidden group">
               <div className="absolute inset-0 bg-amber/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="text-xs text-text-muted mb-1 flex items-center gap-1">
@@ -92,22 +87,45 @@ export function RepoPanel() {
             </div>
           </div>
 
-          <div className="text-xs text-text-muted mb-6 flex justify-between items-center bg-bg/30 px-3 py-2 rounded-md border border-border-glass/50">
+          <div className="text-xs text-text-muted mb-5 flex justify-between items-center bg-bg/30 px-3 py-2 rounded-md border border-border-glass/50">
             <span>Last update</span>
             <span className="font-mono text-text-secondary">{formatDate(selectedRepo.updatedAt)}</span>
           </div>
 
-          <a 
-            href={selectedRepo.url} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="w-full h-11 flex items-center justify-center gap-2 rounded-lg bg-text-primary text-bg text-sm font-semibold hover:bg-white hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all"
-          >
-            Access Repository
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-          </a>
+          {selectedRepo.isProfileRepo && selectedRepo.pageUrl ? (
+            <div className="grid grid-cols-2 gap-2">
+              <a
+                href={selectedRepo.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-border-glass bg-white/5 text-xs font-semibold text-text-secondary transition-all hover:border-white/20 hover:text-text-primary"
+              >
+                Repository
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+              </a>
+              <a
+                href={selectedRepo.pageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-cyan/25 bg-cyan/10 text-xs font-semibold text-cyan transition-all hover:border-cyan/40 hover:bg-cyan/15"
+              >
+                Visit Website
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              </a>
+            </div>
+          ) : (
+            <a
+              href={selectedRepo.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full h-10 flex items-center justify-center gap-2 rounded-lg border border-cyan/20 bg-cyan/10 text-cyan text-sm font-semibold hover:bg-cyan/15 hover:border-cyan/35 transition-all"
+            >
+              Access Repository
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+            </a>
+          )}
         </div>
       </GlassPanel>
-    </div>
+    </motion.div>
   )
 }

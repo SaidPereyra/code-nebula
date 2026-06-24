@@ -53,3 +53,26 @@ export function calcOrbitRadii(
   const step = (outerR - innerR) / (count - 1)
   return Array.from({ length: count }, (_, i) => innerR + i * step)
 }
+
+/**
+ * Generador pseudoaleatorio determinista para geometrías procedurales.
+ */
+export function createSeededRandom(seed: number) {
+  let state = seed
+
+  return () => {
+    state = (state * 9301 + 49297) % 233280
+    return state / 233280
+  }
+}
+
+/**
+ * Distribución normal determinista mediante Box-Muller.
+ */
+export function createGaussianRandom(random: () => number) {
+  return () => {
+    const first = Math.max(random(), Number.EPSILON)
+    const second = Math.max(random(), Number.EPSILON)
+    return Math.sqrt(-2 * Math.log(first)) * Math.cos(Math.PI * 2 * second)
+  }
+}
