@@ -3,7 +3,7 @@
 > **Turn your GitHub into a living code galaxy.**
 
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-000?logo=vercel)](https://vercel.com)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=nextdotjs)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://typescriptlang.org)
 [![Three.js](https://img.shields.io/badge/Three.js-R3F-black?logo=threedotjs)](https://docs.pmnd.rs/react-three-fiber)
 
@@ -52,13 +52,43 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+For WebGL/post-processing QA, validate the final experience with a production build instead of `next dev`:
+
+```bash
+npm run build
+npm run start
+```
+
+`next dev` can show development-only Turbopack/compositor flicker that is not representative of the production render.
+
+---
+
+## ▲ Deploy on Vercel Hobby
+
+Code Nebula is designed for a personal, non-commercial Vercel Hobby deployment.
+
+- Framework preset: Next.js
+- Build command: `npm run build`
+- Output/start settings: Vercel defaults
+- `NEXT_PUBLIC_APP_URL=https://YOUR-DOMAIN.vercel.app`
+- `GITHUB_TOKEN=` optional, server-only, no scopes required for public GitHub data
+
+After deploying, verify:
+
+- `/`
+- `/u/saidpereyra`
+- `/api/github/saidpereyra`
+- `/api/widget/saidpereyra`
+
+The public app can be used for free as a hosted portfolio/demo experience. This does not grant permission to reuse the source code.
+
 ---
 
 ## 🛠 Tech Stack
 
 | Layer | Tech |
 |---|---|
-| Framework | Next.js 15 (App Router) |
+| Framework | Next.js 16 (App Router) |
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 |
 | 3D Engine | React Three Fiber + Drei |
@@ -112,7 +142,11 @@ Add your Code Nebula galaxy to your GitHub profile:
 
 ## 📄 License
 
-MIT — see [LICENSE](LICENSE)
+All rights reserved.
+
+No permission is granted to copy, modify, distribute, sublicense, or use this software without explicit written permission from the author.
+
+The deployed website may be used for free as a hosted experience. The source code is proprietary and is not licensed for reuse. Third-party dependencies are governed by their own licenses.
 
 ---
 

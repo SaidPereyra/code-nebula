@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react'
 import type { RefObject } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import * as THREE from 'three'
 import type { PlanetPositionRegistry } from './NebbiCompanion'
@@ -25,16 +25,24 @@ export function CameraRig({
   planetPositions,
   reducedMotion,
 }: CameraRigProps) {
+  const width = useThree((state) => state.size.width)
   const selectedRepo = useNebulaStore((state) => state.selectedRepo)
+  const isCompactView = width < 640
   const initializedRef = useRef(false)
   const trackedRepoIdRef = useRef<number | null>(null)
   const transitionRef = useRef<'focus' | 'home' | null>(null)
   const transitionElapsedRef = useRef(0)
   const previousTargetRef = useRef(new THREE.Vector3())
   const scratchTargetRef = useRef(new THREE.Vector3())
-  const homePosition = useMemo(() => new THREE.Vector3(targetX, 9.5, 31), [targetX])
+  const homePosition = useMemo(
+    () => new THREE.Vector3(targetX, isCompactView ? 11.6 : 9.5, isCompactView ? 48 : 31),
+    [isCompactView, targetX]
+  )
   const systemCenter = useMemo(() => new THREE.Vector3(targetX, 0, 0), [targetX])
-  const focusOffset = useMemo(() => new THREE.Vector3(7, 5.5, 12), [])
+  const focusOffset = useMemo(
+    () => new THREE.Vector3(isCompactView ? 8 : 7, isCompactView ? 6.2 : 5.5, isCompactView ? 15 : 12),
+    [isCompactView]
+  )
 
   useFrame((state, delta) => {
     if (!active || !controlsRef.current) return
@@ -50,7 +58,7 @@ export function CameraRig({
       state.camera.lookAt(systemCenter)
 
       if (state.camera instanceof THREE.PerspectiveCamera) {
-        state.camera.fov = 46
+        state.camera.fov = isCompactView ? 56 : 46
         state.camera.updateProjectionMatrix()
       }
 

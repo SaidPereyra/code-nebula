@@ -25,7 +25,7 @@ export function WidgetPreview({ username }: WidgetPreviewProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="pointer-events-auto absolute inset-0 z-40 flex items-center justify-center bg-bg/72 p-4 backdrop-blur-md"
+          className="pointer-events-auto absolute inset-0 z-40 flex items-start justify-center overflow-y-auto bg-bg/72 p-3 py-4 backdrop-blur-md sm:items-center sm:p-4"
           role="dialog"
           aria-modal="true"
           aria-label="README widget preview"
@@ -34,7 +34,7 @@ export function WidgetPreview({ username }: WidgetPreviewProps) {
             initial={{ opacity: 0, scale: 0.97, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: 6 }}
-            className="w-full max-w-3xl rounded-3xl border border-white/10 bg-[#050d1b]/95 p-5 shadow-[0_30px_100px_rgba(2,6,23,0.75)] sm:p-6"
+            className="max-h-[calc(100dvh-2rem)] w-full max-w-3xl overflow-y-auto overscroll-contain rounded-3xl border border-white/10 bg-[#050d1b]/95 p-4 shadow-[0_30px_100px_rgba(2,6,23,0.75)] sm:p-6"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -53,7 +53,7 @@ export function WidgetPreview({ username }: WidgetPreviewProps) {
               </button>
             </div>
 
-            <div className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-bg">
+            <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-bg sm:mt-5">
               <Image
                 src={`/api/widget/${encodedUsername}`}
                 alt={`Code Nebula widget for ${username}`}
@@ -64,7 +64,7 @@ export function WidgetPreview({ username }: WidgetPreviewProps) {
               />
             </div>
 
-            <p className="mt-5 text-xs leading-relaxed text-text-secondary">
+            <p className="mt-4 text-xs leading-relaxed text-text-secondary sm:mt-5">
               Paste this Markdown into your GitHub profile README.
             </p>
             <div className="mt-2 flex items-center gap-2 rounded-xl border border-white/10 bg-bg/75 p-2">

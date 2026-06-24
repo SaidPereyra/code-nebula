@@ -23,7 +23,7 @@ export function GalaxySummary() {
           exit={{ opacity: 0, x: -12 }}
           transition={{ duration: 0.24, ease: 'easeOut' }}
           aria-label="Galaxy summary"
-          className="pointer-events-auto absolute left-4 top-20 z-30 w-[calc(100vw-2rem)] max-w-[20rem] rounded-2xl border border-cyan/15 bg-bg/82 p-5 shadow-[0_24px_80px_rgba(2,6,23,0.62)] backdrop-blur-xl sm:left-6 sm:top-24"
+          className="pointer-events-auto absolute left-4 top-20 z-30 max-h-[calc(100dvh-10rem)] w-[calc(100vw-2rem)] max-w-[20rem] overflow-y-auto overscroll-contain rounded-2xl border border-cyan/15 bg-bg/82 p-4 shadow-[0_24px_80px_rgba(2,6,23,0.62)] backdrop-blur-xl sm:left-6 sm:top-24 sm:max-h-[calc(100dvh-8rem)] sm:p-5"
         >
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -44,14 +44,14 @@ export function GalaxySummary() {
             </button>
           </div>
 
-          <div className="mt-5 grid grid-cols-2 gap-2.5">
+          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-5">
             {[
               ['Top language', profile.summary.topLanguage],
               ['Stars', formatNumber(profile.summary.totalStars)],
               ['Forks', formatNumber(profile.summary.totalForks)],
               ['Active repos', String(profile.summary.activeRepos)],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-xl border border-white/8 bg-white/[0.035] p-3">
+              <div key={label} className="rounded-xl border border-white/8 bg-white/[0.035] p-2.5 sm:p-3">
                 <p className="text-[9px] uppercase tracking-wider text-text-muted">{label}</p>
                 <p className="mt-1 truncate font-mono text-sm font-semibold text-text-primary">
                   {value}

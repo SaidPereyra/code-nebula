@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Html } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { getCompanionMessage } from '@/lib/nebula/companionMessages'
 import { useNebulaStore } from '@/store/nebula.store'
@@ -66,6 +66,7 @@ export function NebbiCompanion({
   planetPositions,
   reducedMotion,
 }: NebbiCompanionProps) {
+  const isCompactView = useThree((state) => state.size.width < 640)
   const groupRef = useRef<THREE.Group>(null)
   const bodyRef = useRef<THREE.Group>(null)
   const leftEyeRef = useRef<THREE.Mesh>(null)
@@ -90,7 +91,13 @@ export function NebbiCompanion({
   const home = useMemo(() => new THREE.Vector3(...homePosition), [homePosition])
   const center = useMemo(() => new THREE.Vector3(...systemCenter), [systemCenter])
   const upAxis = useMemo(() => new THREE.Vector3(0, 1, 0), [])
-  const targetOffset = useMemo(() => new THREE.Vector3(1.15, 1.1, 1.35), [])
+  const targetOffset = useMemo(
+    () =>
+      isCompactView
+        ? new THREE.Vector3(1.45, 1.25, 1.75)
+        : new THREE.Vector3(1.15, 1.1, 1.35),
+    [isCompactView]
+  )
   const scratchRef = useRef({
     desiredPosition: new THREE.Vector3(),
     lookTarget: new THREE.Vector3(),
@@ -140,9 +147,10 @@ export function NebbiCompanion({
     )
     groupRef.current.lookAt(lookTarget)
 
+    const targetScale = isCompactView ? 0.86 : 1
     spawnScaleRef.current = reducedMotion
-      ? 1
-      : THREE.MathUtils.damp(spawnScaleRef.current, 1, 4.8, delta)
+      ? targetScale
+      : THREE.MathUtils.damp(spawnScaleRef.current, targetScale, 4.8, delta)
     groupRef.current.scale.setScalar(spawnScaleRef.current)
 
     if (bodyRef.current) {
@@ -196,7 +204,7 @@ export function NebbiCompanion({
         ref={groupRef}
         visible={active}
         position={homePosition}
-        scale={reducedMotion ? 1 : 0.08}
+        scale={reducedMotion ? (isCompactView ? 0.86 : 1) : 0.08}
         onClick={(event) => {
           event.stopPropagation()
           setDialogueVersion((version) => version + 1)
@@ -392,11 +400,13 @@ export function NebbiCompanion({
           <pointLight color="#67e8f9" intensity={0.7} distance={4.5} decay={2} />
         </group>
 
-        <NebbiDialogue
-          key={dialogueKey}
-          message={message}
-          repositoryName={selectedRepo?.name}
-        />
+        {!(isCompactView && selectedRepo) && (
+          <NebbiDialogue
+            key={dialogueKey}
+            message={message}
+            repositoryName={selectedRepo?.name}
+          />
+        )}
       </group>
 
       <mesh ref={scanBeamRef} visible={false}>

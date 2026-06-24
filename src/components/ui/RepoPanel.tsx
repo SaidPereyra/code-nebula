@@ -7,8 +7,10 @@ import { motion } from 'framer-motion'
 
 export function RepoPanel() {
   const selectedRepo = useNebulaStore((state) => state.selectedRepo)
+  const summaryVisible = useNebulaStore((state) => state.summaryVisible)
+  const widgetVisible = useNebulaStore((state) => state.widgetVisible)
   const setSelectedRepo = useNebulaStore((state) => state.setSelectedRepo)
-  if (!selectedRepo) return null
+  if (!selectedRepo || summaryVisible || widgetVisible) return null
 
   return (
     <motion.div
@@ -16,7 +18,7 @@ export function RepoPanel() {
       initial={{ opacity: 0, x: 24 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.28, ease: 'easeOut' }}
-      className="absolute right-4 top-20 z-20 w-[calc(100vw-2rem)] max-w-[19rem] sm:right-6 sm:top-24"
+      className="absolute right-4 top-20 z-20 max-h-[calc(100dvh-10rem)] w-[calc(100vw-2rem)] max-w-[19rem] overflow-y-auto overscroll-contain rounded-2xl sm:right-6 sm:top-24 sm:max-h-[calc(100dvh-8rem)]"
     >
       <GlassPanel className="p-0 border-t overflow-hidden shadow-[0_20px_60px_rgba(2,6,23,0.48)]" style={{ borderTopColor: selectedRepo.theme.primary }}>
         
@@ -29,8 +31,8 @@ export function RepoPanel() {
           style={{ backgroundColor: selectedRepo.theme.primary }} 
         />
 
-        <div className="p-5 relative z-10">
-          <div className="flex justify-between items-start mb-4">
+        <div className="relative z-10 p-4 sm:p-5">
+          <div className="mb-3 flex items-start justify-between sm:mb-4">
             <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-bg/60 border border-border-glass">
               <div 
                 className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_currentColor]" 
@@ -52,20 +54,20 @@ export function RepoPanel() {
             </button>
           </div>
 
-          <h2 className="text-lg font-bold text-text-primary mb-2 line-clamp-2">
+          <h2 className="mb-2 line-clamp-2 text-lg font-bold text-text-primary">
             {selectedRepo.name}
           </h2>
           
           {selectedRepo.description ? (
-            <p className="text-sm text-text-secondary mb-5 line-clamp-3 leading-relaxed">
+            <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-text-secondary sm:mb-5">
               {selectedRepo.description}
             </p>
           ) : (
-            <p className="text-sm text-text-muted italic mb-5">No description provided.</p>
+            <p className="mb-4 text-sm italic text-text-muted sm:mb-5">No description provided.</p>
           )}
 
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            <div className="bg-bg/60 p-3 rounded-lg border border-border-glass relative overflow-hidden group">
+          <div className="mb-4 grid grid-cols-2 gap-2.5 sm:mb-5 sm:gap-3">
+            <div className="group relative overflow-hidden rounded-lg border border-border-glass bg-bg/60 p-2.5 sm:p-3">
               <div className="absolute inset-0 bg-amber/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="text-xs text-text-muted mb-1 flex items-center gap-1">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -75,7 +77,7 @@ export function RepoPanel() {
                 {formatNumber(selectedRepo.stars)}
               </div>
             </div>
-            <div className="bg-bg/60 p-3 rounded-lg border border-border-glass relative overflow-hidden group">
+            <div className="group relative overflow-hidden rounded-lg border border-border-glass bg-bg/60 p-2.5 sm:p-3">
               <div className="absolute inset-0 bg-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="text-xs text-text-muted mb-1 flex items-center gap-1">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan"><circle cx="12" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><circle cx="18" cy="6" r="3"></circle><path d="M18 9v1a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9"></path><path d="M12 12v3"></path></svg>
@@ -87,7 +89,7 @@ export function RepoPanel() {
             </div>
           </div>
 
-          <div className="text-xs text-text-muted mb-5 flex justify-between items-center bg-bg/30 px-3 py-2 rounded-md border border-border-glass/50">
+          <div className="mb-4 flex items-center justify-between rounded-md border border-border-glass/50 bg-bg/30 px-3 py-2 text-xs text-text-muted sm:mb-5">
             <span>Last update</span>
             <span className="font-mono text-text-secondary">{formatDate(selectedRepo.updatedAt)}</span>
           </div>

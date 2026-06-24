@@ -27,7 +27,7 @@ function getTopLanguage(repos: GitHubRepo[]): string {
   return [...counts.entries()].sort(
     ([languageA, countA], [languageB, countB]) =>
       countB - countA || languageA.localeCompare(languageB)
-  )[0]?.[0] ?? 'Unknown'
+  )[0]?.[0] ?? 'Mixed'
 }
 
 function getDominantEnergy(
@@ -71,7 +71,7 @@ export function mapToNebulaProfile(
       name: repo.name,
       description: repo.description,
       url: repo.htmlUrl,
-      language: repo.language ?? 'Unknown',
+      language: repo.language ?? 'Mixed',
       stars: repo.stars,
       forks: repo.forks,
       updatedAt: repo.updatedAt,

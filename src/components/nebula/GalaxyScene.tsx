@@ -28,13 +28,14 @@ export function GalaxyScene({ profile, active, reducedMotion }: GalaxySceneProps
   const controlsRef = useRef<OrbitControlsImpl>(null)
   const controlsInteractingRef = useRef(false)
   const systemOffset = width >= 1024 ? -2.2 : 0
+  const isCompactView = width < 640
   const planetPositions = useMemo<PlanetPositionRegistry>(
     () => new Map(profile.repos.map((repo) => [repo.id, new THREE.Vector3()])),
     [profile.repos]
   )
   const nebbiHome = useMemo<[number, number, number]>(
-    () => [systemOffset + 3.4, 3.1, 2.2],
-    [systemOffset]
+    () => isCompactView ? [systemOffset + 4.8, 4.1, 4.8] : [systemOffset + 3.4, 3.1, 2.2],
+    [isCompactView, systemOffset]
   )
   const systemCenter = useMemo<[number, number, number]>(
     () => [systemOffset, 0, 0],
@@ -58,8 +59,8 @@ export function GalaxyScene({ profile, active, reducedMotion }: GalaxySceneProps
           target={[systemOffset, 0, 0]}
           enablePan={false}
           enableZoom
-          minDistance={13}
-          maxDistance={52}
+          minDistance={isCompactView ? 20 : 13}
+          maxDistance={isCompactView ? 72 : 52}
           maxPolarAngle={Math.PI / 1.8}
           minPolarAngle={Math.PI / 6}
           autoRotate={!reducedMotion && !selectedRepo}
